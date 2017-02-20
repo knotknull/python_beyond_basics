@@ -46,7 +46,8 @@ print("copy = {}".format(copy))
 rep = [5, 10]
 print("rep={}  rep*3={}".format(rep, rep * 3))
 
-# list repetition is used to initialize a known quantity to an initila value
+# list repetition is used to initialize a known quantity to an initial value
+# i.e. initialize an array of 1000 to 0
 # NOTE: repetition is shallow
 bigrep = [0] * 9
 for idx, val in enumerate(bigrep):
@@ -77,4 +78,21 @@ print(goody)
 goody += ['Do']
 print(goody)
 goody.extend(['Fine'])
-print(goody)
+print("goody = ", goody)
+print("s= ", s)
+
+# reverse and sort in place
+goody.reverse()
+print("goody.reverse() = ", goody)
+goody.sort()
+print("goody.sort() = ", goody)
+
+# to sort and reverse without affecting the list directly use
+# sorted()  and reversed()
+test = [' ', 'B', 'a', 'Z', 'z', 'j', 'M', 'p']
+print("test = ", test)
+print("sorted(test) = ", sorted(test))
+print("test = ", test)
+print("reversed(test) = ", reversed(test))  # reverse returns an iterator
+print("list(reversed(test)) = ", list(reversed(test)))  # change back to a list
+print("test = ", test)
