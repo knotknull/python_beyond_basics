@@ -1,53 +1,39 @@
 #!/usr/bin/env python3.5
-import sys  # to write to std error
+""" keypress - A module for detecting a single keypres."""
 
+# The following code will attemp to import a windows specific module and
+# if that fails an ImportError will be reaised and caught at which point
+# unix / linux specific modules will be import.  If successful getkey is
+# for defined unix / linux otherwise tty module will throw an ImportError
+# which is NOT caught and sent back to the caller.
 
-def sqrt(x):
-    """ Compute square roots using the method of Heron of Alexandria.
+try:
+    import msvcrt
 
-    Args:
-        x: The number for which the square root is to be computed
+    def getkey():
+        """Wait for a keypress and return a signle character string."""
+        return msvcrt.getch()
 
-    Returns:
-         The square root of x.
+except ImportError as e:
 
-    Raises:
-        ValueError:  If x is negative
-     """
-    if x < 0:
-        raise ValueError("Cannot compute square root "
-                         "of negative number {}".format(x))
-    guess = x
-    i = 0
-    while guess * guess != x and i < 20:
-        print("sqrt: guess={}, x={}, i={}".format(guess, x, i))
-        guess = (guess + x / guess) / 2.0
-        i += 1
-    return guess
+    import sys
+    import tty
+    import termios
 
+    print("ImportError caught e = {}".format(e))
 
-def main():
-    try:
-        print(sqrt(25))
-        print(sqrt(9))
-        print(sqrt(8))
-        print(sqrt(2))
-        print(sqrt(-1))        # Returns ZeroDivisionError
-        print("Never Hits Here ....")
-    except ValueError as e:
-        print(e, file=sys.stderr)
-    print("Program execution continues normally here")
-    # Types of errors
-    # IndexError:
-    # z = [1, 4, 3]
-    # z[4]
-    # ValueError:
-    # y = int("cat")
-    # KeyError:
-    # say = dict(eenie=1, meenie=2, minie=3, moe=4)
-    # say['hi']
+    def getkey():
+        """Wait for a keypress and returna signle character string."""
+        fd = sys.stdin.fileno()
+        original_attr = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, original_attr)
+            return ch
 
-    # NOTE: AVOID Protecting Against TypeErrors!!  Just let it fail
+    # If either of the Unix-specific tty or termios are not found,
+    # we allow for the ImportError to propogate from here
 
-if __name__ == '__main__':
-    main()
+getkey()
