@@ -15,9 +15,9 @@ print("words = ", words)
 # here comes the Comprehension:
 # declared with brackets like a list but contains "delarative code" which
 # describes how the is created
-print("compy = [len(word) for word in words]")
-compy = [len(word) for word in words]
-print("compy = ", compy)
+print("compre = [len(word) for word in words]")
+compre = [len(word) for word in words]
+print("compre = ", compre)
 
 #  generic form: [ expr(item) for item in iterable ]
 # This is the same
