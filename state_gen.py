@@ -4,7 +4,7 @@ from pprint import pprint as pp
 """Module for demonstrating generator execution"""
 # Stateful Generators
 #       - generators resume execution
-#       - can maintain state in local variables
+#       - can maintain state in local variables between calls
 #       - complex control flow
 #       - lazy evaluation
 #
@@ -31,7 +31,7 @@ def take(count, iterable):
     for item in iterable:
         if xcnt == count:
             return
-        xcnt += 1
+        xcnt += 1       # NOTE: between calls xcnt value does not get reset
         yield item
 
 
