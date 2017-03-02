@@ -208,13 +208,13 @@ pp(f._seating)
 ##
 # rows, seats = self._aircraft.seating_plan
 # self._seating = [None] + [{letter: None for letter in seats} for _ in rows]
-#                    ^           ^       ^
-#            /-------|           |       |
-#            |                   |       Dictionary comprehension which takes
-#        Zeroth row = None       |       a letter in seats and creates k, v of
-#                                |       k=Seat Letter, v=None (initialization)
-#                                |
-#                            Listcomprehension creating an entry for each row
-#                            this is iterated via for _ in rows
-#                            NOTE: _ is used because don't need row number
+#                    ^     ^       ^
+#            /-------|     |       |
+#            |             |       Dictionary comprehension which takes
+#        Zeroth row = None |       a letter in seats and creates k, v of
+#                          |       k=Seat Letter, v=None (initialization)
+#                          |
+#                          Listcomprehension creating an entry for each row
+#                          this is iterated via for _ in rows
+#                          NOTE: _ is used because don't need row number
 ##
