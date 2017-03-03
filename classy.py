@@ -138,50 +138,130 @@ class Flight:
                    for row in self._seating  # returns not None rows i.e.
                    if row is not None)       # skips very first unused row
 
+    # Does this take a function as card_printer ??
+    def make_boarding_cards(self, card_printer):
+        for passenger, seat in sorted(self._passenger_seats()):
+            card_printer(passenger, seat, self.number(), self.aircraft_model())
 
+    # Hey look a generator for passenger seats
+    def _passenger_seats(self):
+        """An iterable series of passenger seating allocations."""
+        row_numbers, seat_letters = self._aircraft.seating_plan()
+        for row in row_numbers:
+            for letter in seat_letters:
+                passenger = self._seating[row][letter]
+                if passenger is not None:
+                    yield(passenger, "{}{}".format(row, letter))
+
+
+# class Aircraft:
+#
+#   def __init__(self, registration, model, num_rows, num_seats_per_row):
+#        self._registration = registration
+#        self._model = model
+#        self._num_rows = num_rows
+#        self._num_seats_per_row = num_seats_per_row
+#
+#    def registration(self):
+#        return self._registration
+#
+#    def model(self):
+#        return self._model
+#
+#        # Here we go this is going to be fun
+#        # this returns a tupl of range(1, num_rows) and a
+#        # string or alphas, one for each num_seats per row
+#        # i.e.  (range(1,15), 'ABCDEF')
+#    def seating_plan(self):
+#        return (range(1, self._num_rows + 1),
+#                "ABCDEFGHJK"[:self._num_seats_per_row])
+
+
+# Create an abstract baseclass called Aircraft
+# This class can only be base class and cannot stand on it's own.
+# call to self.seating_plan() when it is not declared in baseclass
+# makes it abstract
 class Aircraft:
 
-    def __init__(self, registration, model, num_rows, num_seats_per_row):
+    def __init__(self, registration):
         self._registration = registration
-        self._model = model
-        self._num_rows = num_rows
-        self._num_seats_per_row = num_seats_per_row
 
     def registration(self):
         return self._registration
 
+    def num_seats(self):
+        rows, row_seats = self.seating_plan()
+        return len(rows) * len(row_seats)
+
+
+# Create specific type of Aircraft and use those instead of Aircraft class
+# This is a derived class, you specify the base class via parenthesis after
+# class name:  class AirbusA319(Aircraft):
+#
+class AirbusA319(Aircraft):
+
     def model(self):
-        return self._model
+        return "Airbus A319"
 
-        # Here we go this is going to be fun
-        # this returns a tupl of range(1, num_rows) and a
-        # string or alphas, one for each num_seats per row
-        # i.e.  (range(1,15), 'ABCDEF')
     def seating_plan(self):
-        return (range(1, self._num_rows + 1),
-                "ABCDEFGHJK"[:self._num_seats_per_row])
+        return range(1, 23), "ABCDEF"
 
 
-def make_flight():
-    f = Flight("AA1225",
-               Aircraft("XPy1", "PyAir 220", num_rows=22, num_seats_per_row=6))
+#  AibrusA319 and Boeing777  are "duck types".
+#  They have similar class def and methods
+class Boeing777(Aircraft):
+
+    def model(self):
+        return "Boeing 777"
+
+    def seating_plan(self):
+        return range(1, 56), "ABCDEFGHJK"
+
+
+def make_flights():
+    f = Flight("AA1225", AirbusA319("XPy1"))
     f.allocate_seat('13D', 'Father Guido Sarducci')
     f.allocate_seat('5F', 'Pope John')
     # f.allocate_seat('5F', 'The Devil')
     f.allocate_seat('20A', 'Mr. Buddha')
     f.allocate_seat('19B', 'Sonny Bono')
 
-    return f
+    g = Flight("AF72", Boeing777("F-GPS"))
+    g.allocate_seat('55K', 'Larry Wall')
+    g.allocate_seat('33G', 'Yukihiro Matsumoto')
+    g.allocate_seat('4B', 'Brian Kernighan')
+    g.allocate_seat('4A', 'Dennis Ritchie')
+    return f, g
+
+
+def console_card_printer(passenger, seat, flight_number, aircraft):
+    output = "| Name: {0}"      \
+        "  Flight: {1}"    \
+        "  Seat: {2}"      \
+             "  Aircraft: {3}"  \
+             " |".format(passenger, flight_number, seat, aircraft)
+    banner = "+" + '-' * (len(output) - 2) + '+'
+    border = "|" + ' ' * (len(output) - 2) + '|'
+    lines = [banner, border, border, output, border, border, banner]
+    card = '\n'.join(lines)
+    print(card)
+    print()
 
 
 # this is a 'Flight' object
-f = make_flight()
+f, g = make_flights()
 print("type(f) = {}".format(type(f)))
 print ("f.number()  = ", f.number())
+print ("g.number()  = ", g.number())
 print ("f.airline() = ", f.airline())
-print("aircraft.model = ", f.aircraft_model())
+print("f.aircraft.model = ", f.aircraft_model())
+print("g.aircraft.model = ", g.aircraft_model())
+print("f.num_seats = ", f._aircraft.num_seats())
+print("g.num_seats = ", g._aircraft.num_seats())
 print("f.seating_plan = ")
 pp(f._seating)
+print("g.seating_plan = ")
+pp(g._seating)
 
 # Move Buddha next to the Pope
 print ("Number of available seats {}".format(f.num_available_seats()))
@@ -191,6 +271,9 @@ f.allocate_seat("1E", "Kid Ad-Rock")
 print ("Number of available seats {}".format(f.num_available_seats()))
 pp(f._seating)
 
+# call make_boarding_cards.
+# NOTE: we are passing a function which is just an object
+f.make_boarding_cards(console_card_printer)
 
 # acraft = Aircraft(registration="X-Py1", model="Pythair 220",
 #                   num_rows=22, num_seats_per_row=6)
@@ -218,3 +301,12 @@ pp(f._seating)
 #                          this is iterated via for _ in rows
 #                          NOTE: _ is used because don't need row number
 ##
+
+# Duck Typing: An objects fitness for purpose is determined at the time of use.
+# objects suitability for use is not based on inheritance or base classes
+
+# Inheritance a sub-class can derive from a base class,
+# inheriting its behaviour and making behaviour specific to sub-class
+# Python uses late binding, hence polymorphism can be tried with any object.
+# It will succeed if the object "fits"
+# Note: Python inheritance is most useful for sharing implementation
