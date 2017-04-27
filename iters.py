@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.5
+#!/usr/bin/env python3.6
 from pprint import pprint as pp
 
 # Iteration Protocols
@@ -35,4 +35,4 @@ print ("next(x_iterator)  = {}".format(next(x_iterator)))
 
 y_iterator = iter(x_iterable)
 print("first(y_iterator) = {}".format(first(y_iterator)))
-print("first(set() = {}".format(first(set())))
+print("first(set() = {}".format(first(set(y_iterator))))
